@@ -1,6 +1,6 @@
 var express = require("express");
 var app = express();
-var router = require("../routes/routes");
+var router = require("../src/routes/routes");
  
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
