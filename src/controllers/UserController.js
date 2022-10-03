@@ -1,4 +1,5 @@
 var User = require("../models/User");
+var PasswordToken = require("../models/PasswordToken");
 
 class UserController {
   async index(req, res) {
@@ -76,6 +77,19 @@ class UserController {
     if (result.status) {
       res.status(200);
       res.send("Okay!");
+    } else {
+      res.status(406);
+      res.send(result.err);
+    }
+  }
+
+  async recoverpassword(req, res) {
+    var email = req.body.email;
+    var result = await PasswordToken.create(email);
+    if (result.status) {
+      console.log(result.token);
+      res.send("" + result.token);
+      // NodeMailer.send(result.token);
     } else {
       res.status(406);
       res.send(result.err);
