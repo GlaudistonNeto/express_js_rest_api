@@ -58,7 +58,9 @@ class User {
 
   async findEmail(email) {
     try {
-      var result = await knex.select("*").from("users").where({email: email});
+      var result = await knex.select("*")
+                             .from("users")
+                             .where({email: email});
       
       if (result.length > 0) {
         return true;
@@ -83,7 +85,7 @@ class User {
           if (result == false) {
             editUser.email = email;
           } else {
-            return ({ status: false, msg: "User email already registered." });
+            return { status: false, msg: "User email already registered." };
           }
         }
       }
@@ -97,13 +99,13 @@ class User {
       }
 
       try {
-        var result = await knex.update(editUser).where({ id: id }).table("users");
+        await knex.update(editUser).where({ id: id }).table("users");
         return ({ status: true });
       } catch (err) {
         return ({ status: false, err });
       }
     } else {
-      return ({ status: false, msg: "User does not exist." });
+      return ({ status: false, err: "User does not exist." });
     }
   }
 
@@ -115,7 +117,7 @@ class User {
         await knex.delete().where({id: id}).table("users");
         return {status: true}
       } catch (err) {
-        return {status: false, err}
+        return {status: false, err: err}
       }
     } else {
       return {status: false, err: "This user does not exist. It cannot be deleted."}

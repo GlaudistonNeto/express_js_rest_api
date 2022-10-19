@@ -13,5 +13,6 @@ router.post("/recoverpassword",
              UserController.recoverPassword);
 router.post("/changepassword",
              UserController.changePassword);
+router.post("/login", UserController.login);
 
 module.exports = router;

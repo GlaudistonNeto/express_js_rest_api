@@ -1,5 +1,9 @@
 var User = require("../models/User");
 var PasswordToken = require("../models/PasswordToken");
+var jwt = require("jsonwebtoken");
+
+var secret = "mK5(uH6#lU0+xJ9%";
+const bcrypt = require("bcrypt");
 
 class UserController {
   async index(req, res) {
@@ -24,12 +28,14 @@ class UserController {
 
     if (email == undefined || email == '') {
       res.status(400);
-      res.json({msg: "Invalid email."});
+      res.json({err: "Invalid email."});
+      return;
     }
 
     if (name == undefined || name == '') {
       res.status(400);
-      res.json({msg: "Invalid name."});
+      res.json({err: "Invalid name."});
+      return;
     }
 
     if (password == undefined || password == '') {
@@ -48,7 +54,6 @@ class UserController {
 
     await User.new(email, password, name);
 
-    res.status(200);
     res.send("All done!");
   }
 
@@ -57,7 +62,6 @@ class UserController {
     var result = await User.update(id, email, name, role);
     if (result != undefined) {
       if (result.status) {
-        res.status(200);
         res.send("Okay!");
       } else {
         res.status(406);
@@ -75,7 +79,6 @@ class UserController {
     var result = await User.delete(id);
 
     if (result.status) {
-      res.status(200);
       res.send("Okay!");
     } else {
       res.status(406);
@@ -110,7 +113,32 @@ class UserController {
       res.send("Invalid Token!");
     }
   }
+
+  async login(req, res) {
+    var email = req.body;
+
+    var user = await User.findByEmail(email);
+
+    if (user != undefined) {
+      var result = await bcrypt.compare(password,
+                                        req.body.user.password);
+
+      if (result) {
+        var token = jwt.sign({ email: user.email,
+                               role: user.role },
+                              secret);
+        res.json({ token: token });
+      } else {
+        res.status(406);
+        res.send("Wrong credentials!");
+      }
+    } else {
+      res.json({ status: false });
+    }
+  }
 }
 
-
 module.exports = new UserController();
+
+
+
