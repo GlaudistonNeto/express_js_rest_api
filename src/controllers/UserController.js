@@ -44,7 +44,7 @@ class UserController {
       return;
     }
 
-    var emailExists = await User.findEmail(email);
+    var emailExists = await User.findByEmail(email);
 
     if (emailExists) {
       res.status(406);

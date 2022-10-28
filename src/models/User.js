@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const knex = require("../database/connection");
 const PasswordToken = require("./PasswordToken");
+const jwt = require("jsonwebtoken");
+const secret = "kP5$pP8>dU4<lA0+bX7?vB3^fV3#hR9!";
 
 // service
 
@@ -49,18 +51,19 @@ class User {
   async new (email, password, name) {
     try {
 
-      var hash = await bcrypt.hash(password, 10);
+      var salt = bcrypt.genSaltSync(10);
+      var hash = await bcrypt.hash(password, salt);
       await knex.insert({email, password: hash, name, role: 0}).table("users");
     } catch (err) {
       console.log(err);
     }
   }
 
-  async findEmail(email) {
+  async findByEmail(email) {
     try {
       var result = await knex.select("*")
-                             .from("users")
-                             .where({email: email});
+                             .where({email: email})
+                             .table("users");
       
       if (result.length > 0) {
         return true;
@@ -81,7 +84,7 @@ class User {
 
       if (email != undefined) {
         if (email != user.email) {
-          var result = await this.findEmail(email);
+          var result = await this.findByEmail(email);
           if (result == false) {
             editUser.email = email;
           } else {
